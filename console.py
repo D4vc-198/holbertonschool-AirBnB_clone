@@ -7,6 +7,7 @@ class HCommand(cmd.Cmd):
     prompt = '(hbnb)'
 
     """ Comandos básicos """
+
     def func_EOF(self, args):
         "EOF commando to exit the program\n"
         return True

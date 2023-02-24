@@ -1,52 +1,48 @@
 #!/usr/bin/python3
 import cmd
-from models import BaseModel
 from models import FileStorage
+from models import BaseModel , User, Amenity, Review, City, Place, State
 
 
-class HCommand(cmd.Cmd):
-    prompt = '(hbnb)'
-
-    """ Comandos básicos """
-
-    def func_EOF(self, args):
+class HBNBCommand(cmd.Cmd):
+    prompt = '(hbnb) '
+    def do_EOF(self, arg):
         """
+        EOF command to exit the program
         """
-        "EOF commando to exit the program\n"
         return True
-
-    def func_quit(self, args):
+    def do_quit(self, arg):
+        """
+        Quit command to exit the program
+        """
+        return True
+    def emptyline(self):
         """
         """
-        'Quit command to exit the program\n'
-
-    def lineavacia(self):
         pass
-
-    def func_create(self, arg):
-        'Create a new instance\n'
+    def do_create(self, arg):
         """
-        Create a new instance of AIRBNB models
+        Creates a new instance of Airbnb models
+        Usage: Create <ClassName>
         """
         if len(arg) == 0:
             print("** class name missing **")
         else:
             try:
                 args = arg.split()
-                # split the args and use eval (evaluate expression dynamically to Python expression) for example :
-                # arg [0] = BaseModel it will evaluate to BaseModel()
-                # arg[0] = ahmed it will fail cuz there is no method or any python expretion as ahmed()
-                # it will only work with method or module imported in the file source
-                new_inst = eval(args[0])()
+                # it will only work with module imported in the file source
+                # else raise exception
+                new_inst = eval("{}()".format(args[0]))
                 new_inst.save()
                 print(new_inst.id)
             except:
                 print("** class doesn't exist **")
-
     def do_show(self, arg):
         """
+        Prints the string representation of an instance based on
+        the class name and id
+        Usage: show <Class_Name> <obj_id>
         """
-        container_obj = []
         args = arg.split()
         if len(args) == 0:
             print("** class name missing **")
@@ -56,7 +52,7 @@ class HCommand(cmd.Cmd):
         except:
             print("** class doesn't exist **")
             return
-        if len (args) == 1:
+        if len(args) == 1:
             print("** instance id missing **")
         else:
             storage = FileStorage()
@@ -68,9 +64,10 @@ class HCommand(cmd.Cmd):
                 print(value)
             else:
                 print("** no instance found **")
-
     def do_destroy(self, arg):
         """
+        Deletes an instance based on the class name and id
+        Usage: destroy <Class_Name> <obj_id>
         """
         args = arg.split()
         container_obj = []
@@ -82,7 +79,7 @@ class HCommand(cmd.Cmd):
         except:
             print("** class doesn't exist **")
             return
-        if len (args) == 1:
+        if len(args) == 1:
             print("** instance id missing **")
         else:
             storage = FileStorage()
@@ -94,30 +91,42 @@ class HCommand(cmd.Cmd):
                 storage.save()
             else:
                 print("** no instance found **")
-
     def do_all(self, arg):
         """
+        Prints all string representation of all instances
+        based or not on the class name.
+        Usage: all <Class_Name>  OR  all
         """
         storage = FileStorage()
         storage.reload()
         container_obj = storage.all()
         args = arg.split()
+        list_strings = []
         if len(args) == 0:
             for obj_id in container_obj.keys():
                 obj = container_obj[obj_id]
-                print(obj)
+                list_strings.append(str(obj))
+            print(list_strings)
             return
         if len(args) == 1:
             try:
                 for obj_id in container_obj.keys():
                     if type(container_obj[obj_id]) is eval(args[0]):
-                        print(container_obj[obj_id])
+                        # the solution is using reper() => print the type too
+                        # str(container_obj[obj_id]) => is a string
+                        obj = container_obj[obj_id]
+                        list_strings.append(str(obj))
+                print(list_strings)
             except:
                 print("** class doesn't exist **")
                 return
-
     def do_update(self, arg):
         """
+        Updates an instance based on the class name and id
+        by adding or updating attribute
+        Usage: update <class name> <id> <attribute name> "<attribute value>"
+        $ update BaseModel 1234-1234 email "x@g.com" first_name "yy" is equal
+        $ update BaseModel 1234-1234 email "x@g.com"
         """
         storage = FileStorage()
         storage.reload()
@@ -136,15 +145,16 @@ class HCommand(cmd.Cmd):
                 key_id = args[0] + "." + args[1]
                 container_obj = storage.all()
                 if key_id in container_obj:
+                    obj = ""
                     try:
-                        value = container_obj[key_id]
-                        type_atr = type(getattr(value, args[2]))
+                        obj = container_obj[key_id]
+                        type_atr = type(getattr(obj, args[2]))
                         args[3] = type_atr(args[3])
                     except:
                         pass
                     value_id = args[3]
                     value_id = value_id[1:-1]
-                    setattr(value, args[2], value_id)
+                    setattr(obj, args[2], value_id)
                     storage.save()
                 else:
                     print("** no instance found **")
@@ -152,4 +162,6 @@ class HCommand(cmd.Cmd):
             except:
                 print("** class doesn't exist **")
 
-HCommand().cmdloop()
+
+if __name__ == "__main__":
+    HBNBCommand().cmdloop()

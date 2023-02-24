@@ -5,10 +5,13 @@ Base Module For Air BnB Console
 from uuid import uuid4
 from datetime import datetime
 import models
+
+
 class BaseModel:
     """
     Base Class of AirBnb Console
     """
+
     def __init__(self, *args, **kwargs):
         """
         Init of Object
@@ -23,7 +26,7 @@ class BaseModel:
         if len(kwargs) == 0:
             self.id = str(uuid4())
             self.created_at = datetime.now()
-            self.updated_at = datetime.now()
+            self.updated_at = self.created_at
             models.storage.new(self)
             models.storage.save()
         # each new instance created is added to the storage variable __objects
@@ -35,15 +38,14 @@ class BaseModel:
             for key, val in kwargs.items():
                 if "__class__" not in key:
                     setattr(self, key, val)
+
     def __str__(self):
         """
         print the instance
         :return:
         """
-        return ("[{}] ({}) {})".format(
-            self.__class__.__name__,
-            self.id,
-            self.__dict__))
+        return "[{:s}] ({:s}) {}".format(self.__class__.__name__, self.id,
+                                         self.__dict__)
 
     def save(self):
         """
@@ -52,6 +54,7 @@ class BaseModel:
         self.updated_at = datetime.now()
         # only when we save the instance, its writen into the json file
         models.storage.save()
+
     def to_dict(self):
         """
             convert  self dict and other public instance

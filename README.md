@@ -1,1 +1,5 @@
-AirBnB clone - The console
+#AirBnB clone - The console
+
+### Installation
+
+### Available commands:
